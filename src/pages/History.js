@@ -14,6 +14,7 @@ function History({ darkMode }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [center, setCenter] = useState([-6.306393, 106.888775]);
+  const [showSummary, setShowSummary] = useState(true);
 
   // Format tanggal untuk API
   const formatDateForAPI = (date) => {
@@ -216,6 +217,13 @@ function History({ darkMode }) {
     }
   };
 
+  // Reset showSummary ketika data baru diambil
+  useEffect(() => {
+    if (historyData && historyData.track_points) {
+      setShowSummary(true);
+    }
+  }, [historyData]);
+
   return (
     <div className="history-container">
       <div className="history-controls">
@@ -275,16 +283,52 @@ function History({ darkMode }) {
       </div>
 
       {historyData && historyData.track_points && historyData.track_points.length > 0 ? (
-        <div className="history-summary">
-          <h3>Trip Summary</h3>
-          <div className="summary-details">
-            <p>Vehicle: {historyData.device_id}</p>
-            <p>Total Points: {historyData.track_points.length}</p>
-            <p>Total Distance: {calculateTotalDistance(historyData.track_points).toFixed(2)} km</p>
-            <p>Total Time: {calculateTotalTime(historyData.track_points).toFixed(0)} minutes</p>
-            <p>Average Speed: {(calculateTotalDistance(historyData.track_points) / (calculateTotalTime(historyData.track_points) / 60)).toFixed(1)} km/h</p>
+        showSummary ? (
+          <div className="history-summary">
+            <div className="summary-header">
+              <h3>Trip Summary</h3>
+              <button 
+                className="close-button"
+                onClick={() => setShowSummary(false)}
+                title="Close summary"
+              >
+                ×
+              </button>
+            </div>
+            <div className="summary-details">
+              <p>
+                <span>Vehicle:</span>
+                <span>{historyData.device_id}</span>
+              </p>
+              <p>
+                <span>Total Points:</span>
+                <span>{historyData.track_points.length}</span>
+              </p>
+              <p>
+                <span>Total Distance:</span>
+                <span>{calculateTotalDistance(historyData.track_points).toFixed(2)} km</span>
+              </p>
+              <p>
+                <span>Total Time:</span>
+                <span>{calculateTotalTime(historyData.track_points).toFixed(0)} minutes</span>
+              </p>
+              <p>
+                <span>Average Speed:</span>
+                <span>
+                  {(calculateTotalDistance(historyData.track_points) / (calculateTotalTime(historyData.track_points) / 60)).toFixed(1)} km/h
+                </span>
+              </p>
+            </div>
           </div>
-        </div>
+        ) : (
+          <button 
+            className="show-summary-button"
+            onClick={() => setShowSummary(true)}
+            title="Show summary"
+          >
+            Show Summary
+          </button>
+        )
       ) : null}
 
       <MapContainer 
