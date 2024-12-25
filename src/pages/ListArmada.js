@@ -5,24 +5,49 @@ function ListArmada() {
   const [armada, setArmada] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [lastUpdate, setLastUpdate] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
-    fetchArmada();
-    const interval = setInterval(fetchArmada, 30000);
+    fetchArmada(); // Initial fetch
+    
+    // Set interval untuk refresh setiap 5 detik
+    const interval = setInterval(() => {
+      fetchArmada(false); // false = silent refresh (tanpa loading indicator)
+    }, 5000);
+
+    // Cleanup interval saat component unmount
     return () => clearInterval(interval);
   }, []);
 
-  const fetchArmada = async () => {
+  const fetchArmada = async (showLoading = true) => {
+    if (showLoading) {
+      setLoading(true);
+      setIsRefreshing(true);
+    }
+
     try {
       const response = await fetch('http://localhost:3013/api/tracking/fleet');
       if (!response.ok) throw new Error('Failed to fetch');
       const result = await response.json();
+      
       setArmada(result.data);
-      setLoading(false);
+      setLastUpdate(new Date().toLocaleTimeString());
+      setError(null);
     } catch (err) {
+      console.error('Fetch error:', err);
       setError(err.message);
-      setLoading(false);
+    } finally {
+      if (showLoading) {
+        setLoading(false);
+        setIsRefreshing(false);
+      }
     }
+  };
+
+  // Handle manual refresh
+  const handleRefresh = () => {
+    fetchArmada(true); // true = tampilkan loading indicator
   };
 
   // Fungsi untuk mengecek apakah update terakhir kurang dari 1 menit
@@ -104,9 +129,21 @@ function ListArmada() {
       <div className="list-header">
         <h2>Daftar Armada Aktif</h2>
         <div className="header-info">
-          <span>Total Armada: {armada.length}</span>
-          <button onClick={fetchArmada} className="refresh-button">
-            🔄 Refresh
+          <div className="update-info">
+            <span>Total Armada: {armada.length}</span>
+            {lastUpdate && (
+              <span className="last-update">
+                Last Update: {lastUpdate}
+              </span>
+            )}
+          </div>
+          <button 
+            onClick={handleRefresh} 
+            className={`refresh-button ${isRefreshing ? 'refreshing' : ''}`}
+            disabled={isRefreshing}
+          >
+            <span className="refresh-icon">🔄</span>
+            {isRefreshing ? 'Refreshing...' : 'Refresh'}
           </button>
         </div>
       </div>

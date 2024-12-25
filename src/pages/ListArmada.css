@@ -13,24 +13,63 @@
   .header-info {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 20px;
+  }
+  
+  .update-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+  }
+  
+  .last-update {
+    font-size: 0.9em;
+    color: #666;
+  }
+  
+  .dark-mode .last-update {
+    color: #aaa;
   }
   
   .refresh-button {
-    padding: 8px 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
     background: #4CAF50;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
     transition: all 0.3s ease;
   }
   
-  .refresh-button:hover {
+  .refresh-button:hover:not(:disabled) {
     background: #45a049;
+  }
+  
+  .refresh-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  
+  .refresh-icon {
+    display: inline-block;
+    transition: transform 0.5s ease;
+  }
+  
+  .refreshing .refresh-icon {
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
   
   .armada-table-container {
@@ -159,4 +198,18 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
+  }
+  
+  /* Optional: Tambahkan highlight effect untuk data baru */
+  .table-row-highlight {
+    animation: highlightNew 1s ease;
+  }
+  
+  @keyframes highlightNew {
+    from {
+      background-color: rgba(76, 175, 80, 0.1);
+    }
+    to {
+      background-color: transparent;
+    }
   }
