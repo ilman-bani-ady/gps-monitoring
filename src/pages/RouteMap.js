@@ -17,12 +17,55 @@ function RouteMap({ darkMode }) {
   const [routes, setRoutes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedRoute, setSelectedRoute] = useState(null);
+  const [selectedRoute, setSelectedRoute] = useState('');
   const [center, setCenter] = useState([-6.306393, 106.888775]);
+  const [routeDistance, setRouteDistance] = useState(0);
 
   useEffect(() => {
     fetchRoutes();
   }, []);
+
+  // Calculate distance between two points using Haversine formula
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
+
+  // Calculate total route distance
+  const calculateRouteDistance = (stops) => {
+    let total = 0;
+    for (let i = 0; i < stops.length - 1; i++) {
+      total += calculateDistance(
+        stops[i].latitude,
+        stops[i].longitude,
+        stops[i + 1].latitude,
+        stops[i + 1].longitude
+      );
+    }
+    return total;
+  };
+
+  const handleRouteChange = (tripId) => {
+    setSelectedRoute(tripId);
+    if (tripId && routes[tripId]) {
+      const distance = calculateRouteDistance(routes[tripId]);
+      setRouteDistance(distance);
+      
+      // Center map on first stop of selected route
+      if (routes[tripId].length > 0) {
+        setCenter([routes[tripId][0].latitude, routes[tripId][0].longitude]);
+      }
+    } else {
+      setRouteDistance(0);
+    }
+  };
 
   const fetchRoutes = async () => {
     try {
@@ -31,14 +74,8 @@ function RouteMap({ darkMode }) {
       
       const result = await response.json();
       if (result.status === 'success') {
-        // Group routes by rute_trip_id
         const groupedRoutes = groupRoutesByTripId(result.data);
         setRoutes(groupedRoutes);
-        
-        // Set center to first stop if available
-        if (result.data.length > 0) {
-          setCenter([result.data[0].latitude, result.data[0].longitude]);
-        }
       }
       setLoading(false);
     } catch (err) {
@@ -54,34 +91,36 @@ function RouteMap({ darkMode }) {
         acc[stop.rute_trip_id] = [];
       }
       acc[stop.rute_trip_id].push(stop);
-      // Sort stops by rute_sort
       acc[stop.rute_trip_id].sort((a, b) => a.rute_sort - b.rute_sort);
       return acc;
     }, {});
   };
 
-  if (loading) {
-    return <div className="route-loading">Loading routes...</div>;
-  }
-
-  if (error) {
-    return <div className="route-error">Error: {error}</div>;
-  }
+  if (loading) return <div className="route-loading">Loading routes...</div>;
+  if (error) return <div className="route-error">Error: {error}</div>;
 
   return (
     <div className="route-map-container">
       <div className="route-selector">
-        <h3>Available Routes</h3>
-        <div className="route-list">
-          {Object.keys(routes).map((tripId) => (
-            <button
-              key={tripId}
-              className={`route-button ${selectedRoute === tripId ? 'active' : ''}`}
-              onClick={() => setSelectedRoute(tripId)}
-            >
-              Route {tripId}
-            </button>
-          ))}
+        <div className="route-header">
+          <select 
+            value={selectedRoute}
+            onChange={(e) => handleRouteChange(e.target.value)}
+            className="route-dropdown"
+          >
+            <option value="">Select a Route</option>
+            {Object.keys(routes).map((tripId) => (
+              <option key={tripId} value={tripId}>
+                Route {tripId} ({routes[tripId].length} stops)
+              </option>
+            ))}
+          </select>
+          {selectedRoute && (
+            <div className="route-info">
+              <p>Total Distance: {routeDistance.toFixed(2)} km</p>
+              <p>Total Stops: {routes[selectedRoute]?.length || 0}</p>
+            </div>
+          )}
         </div>
       </div>
 
