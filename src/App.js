@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './App.css';
 import L from 'leaflet';
+import Map from './components/Map';
 
 // Fix untuk icon marker
 delete L.Icon.Default.prototype._getIconUrl;
@@ -84,28 +85,8 @@ function App() {
 
         <div className="main-content">
           <Routes>
+            <Route path="/" element={<Map />} />
             <Route path="/armada" element={<ListArmada />} />
-            <Route path="/" element={
-              <MapContainer 
-                center={position} 
-                zoom={13} 
-                scrollWheelZoom={true}
-                className="map-fullscreen"
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                  url={darkMode 
-                    ? 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
-                    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-                  }
-                />
-                <Marker position={position}>
-                  <Popup>
-                    Jakarta, Indonesia
-                  </Popup>
-                </Marker>
-              </MapContainer>
-            } />
           </Routes>
         </div>
       </div>
