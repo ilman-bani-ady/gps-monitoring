@@ -53,6 +53,13 @@
     border-radius: 4px;
     font-size: 14px;
     background: white;
+    color: #333;
+  }
+  
+  .date-picker:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
   }
   
   .dark-mode .vehicle-select,
@@ -60,6 +67,11 @@
     background: #444;
     color: white;
     border-color: #555;
+  }
+  
+  .dark-mode .date-picker:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.3);
   }
   
   .dark-mode .date-picker::-webkit-calendar-picker-indicator {
@@ -387,4 +399,15 @@
       right: 10px;
       left: 10px;
     }
+  }
+  
+  /* Error state */
+  .date-picker.error {
+    border-color: #ff4444;
+  }
+  
+  .error-message {
+    color: #ff4444;
+    font-size: 12px;
+    margin-top: 4px;
   }

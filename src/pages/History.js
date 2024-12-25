@@ -28,9 +28,90 @@ function History({ darkMode }) {
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
   };
 
-  // Format tanggal untuk input HTML
+  // Format tanggal untuk input
   const formatDateForInput = (date) => {
-    return date.toISOString().slice(0, 16); // Format YYYY-MM-DDThh:mm
+    if (!date) return ''; // Handle null/undefined
+    try {
+      const d = new Date(date);
+      if (isNaN(d.getTime())) return ''; // Handle invalid date
+      
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const hours = String(d.getHours()).padStart(2, '0');
+      const minutes = String(d.getMinutes()).padStart(2, '0');
+      
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    } catch (err) {
+      console.error('Error formatting date:', err);
+      return '';
+    }
+  };
+
+  // Handle date change dengan validasi
+  const handleDateChange = (type, value) => {
+    try {
+      if (!value) {
+        // Jika input dikosongkan (clear), set default date
+        const defaultDate = new Date();
+        if (type === 'start') {
+          defaultDate.setHours(0, 0, 0, 0);
+          setStartDate(defaultDate);
+        } else {
+          defaultDate.setHours(23, 59, 59, 999);
+          setEndDate(defaultDate);
+        }
+        return;
+      }
+
+      const newDate = new Date(value);
+      if (isNaN(newDate.getTime())) {
+        throw new Error('Invalid date');
+      }
+
+      if (type === 'start') {
+        setStartDate(newDate);
+        // Pastikan end date tidak lebih awal dari start date
+        if (endDate < newDate) {
+          setEndDate(newDate);
+        }
+      } else {
+        setEndDate(newDate);
+        // Pastikan start date tidak lebih akhir dari end date
+        if (startDate > newDate) {
+          setStartDate(newDate);
+        }
+      }
+    } catch (err) {
+      console.error('Error setting date:', err);
+      // Set tanggal default jika terjadi error
+      const defaultDate = new Date();
+      if (type === 'start') {
+        defaultDate.setHours(0, 0, 0, 0);
+        setStartDate(defaultDate);
+      } else {
+        defaultDate.setHours(23, 59, 59, 999);
+        setEndDate(defaultDate);
+      }
+    }
+  };
+
+  // Format tanggal untuk display
+  const formatDateDisplay = (date) => {
+    if (!date) return '-';
+    try {
+      return new Date(date).toLocaleString('id-ID', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
+    } catch (err) {
+      console.error('Error formatting date display:', err);
+      return '-';
+    }
   };
 
   // Fetch available vehicles
@@ -248,14 +329,17 @@ function History({ darkMode }) {
           <input
             type="datetime-local"
             value={formatDateForInput(startDate)}
-            onChange={(e) => setStartDate(new Date(e.target.value))}
+            onChange={(e) => handleDateChange('start', e.target.value)}
             className="date-picker"
           />
+        </div>
+
+        <div className="control-group">
           <label>End Date:</label>
           <input
             type="datetime-local"
             value={formatDateForInput(endDate)}
-            onChange={(e) => setEndDate(new Date(e.target.value))}
+            onChange={(e) => handleDateChange('end', e.target.value)}
             className="date-picker"
           />
         </div>
@@ -282,54 +366,48 @@ function History({ darkMode }) {
         {error && <div className="error-message">{error}</div>}
       </div>
 
-      {historyData && historyData.track_points && historyData.track_points.length > 0 ? (
-        showSummary ? (
-          <div className="history-summary">
-            <div className="summary-header">
-              <h3>Trip Summary</h3>
-              <button 
-                className="close-button"
-                onClick={() => setShowSummary(false)}
-                title="Close summary"
-              >
-                ×
-              </button>
-            </div>
-            <div className="summary-details">
-              <p>
-                <span>Vehicle:</span>
-                <span>{historyData.device_id}</span>
-              </p>
-              <p>
-                <span>Total Points:</span>
-                <span>{historyData.track_points.length}</span>
-              </p>
-              <p>
-                <span>Total Distance:</span>
-                <span>{calculateTotalDistance(historyData.track_points).toFixed(2)} km</span>
-              </p>
-              <p>
-                <span>Total Time:</span>
-                <span>{calculateTotalTime(historyData.track_points).toFixed(0)} minutes</span>
-              </p>
-              <p>
-                <span>Average Speed:</span>
-                <span>
-                  {(calculateTotalDistance(historyData.track_points) / (calculateTotalTime(historyData.track_points) / 60)).toFixed(1)} km/h
-                </span>
-              </p>
-            </div>
+      {historyData && historyData.track_points && historyData.track_points.length > 0 && showSummary && (
+        <div className="history-summary">
+          <div className="summary-header">
+            <h3>Trip Summary</h3>
+            <button 
+              className="close-button"
+              onClick={() => setShowSummary(false)}
+              title="Close summary"
+            >
+              ×
+            </button>
           </div>
-        ) : (
-          <button 
-            className="show-summary-button"
-            onClick={() => setShowSummary(true)}
-            title="Show summary"
-          >
-            Show Summary
-          </button>
-        )
-      ) : null}
+          <div className="summary-details">
+            <p>
+              <span>Vehicle:</span>
+              <span>{historyData.device_id}</span>
+            </p>
+            <p>
+              <span>Period:</span>
+              <span>{formatDateDisplay(startDate)} - {formatDateDisplay(endDate)}</span>
+            </p>
+            <p>
+              <span>Total Points:</span>
+              <span>{historyData.track_points.length}</span>
+            </p>
+            <p>
+              <span>Total Distance:</span>
+              <span>{calculateTotalDistance(historyData.track_points).toFixed(2)} km</span>
+            </p>
+            <p>
+              <span>Total Time:</span>
+              <span>{calculateTotalTime(historyData.track_points).toFixed(0)} minutes</span>
+            </p>
+            <p>
+              <span>Average Speed:</span>
+              <span>
+                {(calculateTotalDistance(historyData.track_points) / (calculateTotalTime(historyData.track_points) / 60)).toFixed(1)} km/h
+              </span>
+            </p>
+          </div>
+        </div>
+      )}
 
       <MapContainer 
         center={center} 
