@@ -134,3 +134,45 @@
     background: #444;
     color: white;
   }
+  
+  .button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+  }
+  
+  .fetch-button,
+  .export-button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .fetch-button {
+    background: #4CAF50;
+    color: white;
+  }
+  
+  .export-button {
+    background: #2196F3;
+    color: white;
+  }
+  
+  .fetch-button:hover:not(:disabled),
+  .export-button:hover {
+    filter: brightness(1.1);
+  }
+  
+  .fetch-button:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+  }
+  
+  .dark-mode .fetch-button:disabled {
+    background: #666;
+  }

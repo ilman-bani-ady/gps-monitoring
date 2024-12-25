@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 import L from 'leaflet';
 import './History.css';
 
@@ -13,7 +15,7 @@ function History({ darkMode }) {
   const [error, setError] = useState(null);
   const [center, setCenter] = useState([-6.306393, 106.888775]);
 
-  // Format datetime untuk API
+  // Format tanggal untuk API
   const formatDateForAPI = (date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -25,9 +27,9 @@ function History({ darkMode }) {
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
   };
 
-  // Format datetime untuk input
+  // Format tanggal untuk input HTML
   const formatDateForInput = (date) => {
-    return date.toISOString().slice(0, 16);
+    return date.toISOString().slice(0, 16); // Format YYYY-MM-DDThh:mm
   };
 
   // Fetch available vehicles
@@ -59,8 +61,9 @@ function History({ darkMode }) {
     setHistoryData(null);
     
     try {
-      const start = '2024-12-12T00:00:00';  // Sementara hardcode untuk testing
-      const end = '2024-12-12T23:59:59';    // Sementara hardcode untuk testing
+      // Menggunakan tanggal dari input user
+      const start = formatDateForAPI(startDate);
+      const end = formatDateForAPI(endDate);
       
       const url = `http://localhost:3013/api/tracking/history/${selectedVehicle}?start_date=${encodeURIComponent(start)}&end_date=${encodeURIComponent(end)}`;
       
@@ -125,6 +128,94 @@ function History({ darkMode }) {
     return (end - start) / 1000 / 60; // Return minutes
   };
 
+  // Fungsi untuk format tanggal ke string yang readable
+  const formatDateTime = (timestamp) => {
+    if (!timestamp) return '-';
+    return new Date(timestamp).toLocaleString();
+  };
+
+  // Fungsi untuk format koordinat
+  const formatCoordinate = (coord) => {
+    return coord ? Number(coord).toFixed(6) : '-';
+  };
+
+  // Fungsi untuk format kecepatan
+  const formatSpeed = (speed) => {
+    return speed ? `${Number(speed).toFixed(1)} km/h` : '-';
+  };
+
+  // Fungsi untuk export ke Excel
+  const exportToExcel = () => {
+    if (!historyData || !historyData.track_points || historyData.track_points.length === 0) {
+      setError('No data to export');
+      return;
+    }
+
+    try {
+      // Persiapkan data untuk header laporan
+      const reportHeader = [
+        ['Vehicle History Report'],
+        ['Vehicle ID:', historyData.device_id],
+        ['Period:', `${formatDateTime(startDate)} - ${formatDateTime(endDate)}`],
+        ['Total Distance:', `${calculateTotalDistance(historyData.track_points).toFixed(2)} km`],
+        ['Total Time:', `${calculateTotalTime(historyData.track_points).toFixed(0)} minutes`],
+        ['Average Speed:', `${(calculateTotalDistance(historyData.track_points) / (calculateTotalTime(historyData.track_points) / 60)).toFixed(1)} km/h`],
+        ['Total Points:', historyData.track_points.length],
+        [''],  // Empty row for spacing
+        // Header untuk data tracking
+        ['No', 'Timestamp', 'Latitude', 'Longitude', 'Speed', 'Valid']
+      ];
+
+      // Persiapkan data tracking points
+      const trackingData = historyData.track_points.map((point, index) => [
+        index + 1,
+        formatDateTime(point.timestamp),
+        formatCoordinate(point.latitude),
+        formatCoordinate(point.longitude),
+        formatSpeed(point.speed),
+        point.valid ? 'Yes' : 'No'
+      ]);
+
+      // Gabungkan semua data
+      const wsData = [...reportHeader, ...trackingData];
+
+      // Buat workbook dan worksheet
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+      // Styling untuk header
+      const headerStyle = {
+        font: { bold: true },
+        alignment: { horizontal: 'center' }
+      };
+
+      // Apply styling (basic)
+      ws['!cols'] = [
+        { wch: 5 },   // No
+        { wch: 20 },  // Timestamp
+        { wch: 12 },  // Latitude
+        { wch: 12 },  // Longitude
+        { wch: 10 },  // Speed
+        { wch: 8 }    // Valid
+      ];
+
+      // Tambahkan worksheet ke workbook
+      XLSX.utils.book_append_sheet(wb, ws, 'Vehicle History');
+
+      // Generate file Excel
+      const fileName = `vehicle_history_${historyData.device_id}_${new Date().toISOString().slice(0,10)}.xlsx`;
+      const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+      
+      // Save file
+      const blob = new Blob([wbout], { type: 'application/octet-stream' });
+      saveAs(blob, fileName);
+
+    } catch (err) {
+      console.error('Error exporting to Excel:', err);
+      setError('Failed to export data');
+    }
+  };
+
   return (
     <div className="history-container">
       <div className="history-controls">
@@ -161,13 +252,24 @@ function History({ darkMode }) {
           />
         </div>
 
-        <button 
-          onClick={fetchHistory}
-          disabled={!selectedVehicle || loading}
-          className="fetch-button"
-        >
-          {loading ? 'Loading...' : 'Show History'}
-        </button>
+        <div className="button-group">
+          <button 
+            onClick={fetchHistory}
+            disabled={!selectedVehicle || loading}
+            className="fetch-button"
+          >
+            {loading ? 'Loading...' : 'Show History'}
+          </button>
+
+          {historyData && historyData.track_points && historyData.track_points.length > 0 && (
+            <button 
+              onClick={exportToExcel}
+              className="export-button"
+            >
+              Export to Excel
+            </button>
+          )}
+        </div>
 
         {error && <div className="error-message">{error}</div>}
       </div>
