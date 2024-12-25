@@ -1,0 +1,97 @@
+.route-map-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+  }
+  
+  .route-map {
+    flex: 1;
+    height: 100vh;
+  }
+  
+  .route-selector {
+    position: absolute;
+    top: 80px;
+    right: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+  }
+  
+  .dark-mode .route-selector {
+    background: #333;
+    color: white;
+  }
+  
+  .route-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .route-button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    background: #f0f0f0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .route-button:hover {
+    background: #e0e0e0;
+  }
+  
+  .route-button.active {
+    background: #4CAF50;
+    color: white;
+  }
+  
+  .dark-mode .route-button {
+    background: #444;
+    color: white;
+  }
+  
+  .dark-mode .route-button:hover {
+    background: #555;
+  }
+  
+  /* Stop marker styling */
+  .custom-stop-marker .stop-dot {
+    width: 10px;
+    height: 10px;
+    background: #4CAF50;
+    border: 2px solid white;
+    border-radius: 50%;
+    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+  }
+  
+  /* Popup styling */
+  .stop-popup {
+    padding: 5px;
+  }
+  
+  .stop-popup h3 {
+    margin: 0 0 8px 0;
+    color: #333;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 5px;
+  }
+  
+  .dark-mode .stop-popup {
+    background: #333;
+    color: white;
+  }
+  
+  .dark-mode .stop-popup h3 {
+    color: white;
+    border-bottom-color: #555;
+  }

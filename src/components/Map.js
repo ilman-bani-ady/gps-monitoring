@@ -1,10 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './Map.css';
 
-// Custom icon untuk marker
+// Component untuk mengupdate tile layer saat mode berubah
+function TileLayerComponent({ darkMode }) {
+  return (
+    <TileLayer
+      attribution={
+        darkMode
+          ? '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>'
+          : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      }
+      url={
+        darkMode
+          ? 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
+          : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+      }
+    />
+  );
+}
+
 const createCustomIcon = (status) => {
   return L.divIcon({
     className: `custom-marker ${status}`,
@@ -14,15 +31,15 @@ const createCustomIcon = (status) => {
   });
 };
 
-function Map() {
+function Map({ darkMode }) {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [center, setCenter] = useState([-6.306393, 106.888775]); // Default Jakarta
+  const [center, setCenter] = useState([-6.306393, 106.888775]);
 
   useEffect(() => {
     fetchLastLocations();
-    const interval = setInterval(fetchLastLocations, 5000); // Update setiap 5 detik
+    const interval = setInterval(fetchLastLocations, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -98,43 +115,44 @@ function Map() {
   }
 
   return (
-    <MapContainer 
-      center={center} 
-      zoom={13} 
-      className="map-container"
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      
-      {vehicles.map((vehicle) => {
-        const lat = parseFloat(vehicle.last_latitude);
-        const lng = parseFloat(vehicle.last_longitude);
+    <div className={`map-wrapper ${darkMode ? 'dark' : 'light'}`}>
+      <MapContainer 
+        center={center} 
+        zoom={13} 
+        className="map-container"
+        zoomControl={false}
+      >
+        <TileLayerComponent darkMode={darkMode} />
         
-        if (isNaN(lat) || isNaN(lng)) return null;
+        {vehicles.map((vehicle) => {
+          const lat = parseFloat(vehicle.last_latitude);
+          const lng = parseFloat(vehicle.last_longitude);
+          
+          if (isNaN(lat) || isNaN(lng)) return null;
 
-        return (
-          <Marker
-            key={vehicle.device_id}
-            position={[lat, lng]}
-            icon={createCustomIcon(getVehicleStatus(vehicle))}
-          >
-            <Popup>
-              <div className="vehicle-popup">
-                <h3>ID: {vehicle.device_id}</h3>
-                <p>Status: {getVehicleStatus(vehicle)}</p>
-                <p>Speed: {formatSpeed(vehicle.last_speed)}</p>
-                <p>Last Update: {formatDateTime(vehicle.last_update)}</p>
-                <p>
-                  Location: {formatCoordinate(vehicle.last_latitude)}, {formatCoordinate(vehicle.last_longitude)}
-                </p>
-              </div>
-            </Popup>
-          </Marker>
-        );
-      })}
-    </MapContainer>
+          return (
+            <Marker
+              key={vehicle.device_id}
+              position={[lat, lng]}
+              icon={createCustomIcon(getVehicleStatus(vehicle))}
+            >
+              <Popup className={darkMode ? 'dark-popup' : 'light-popup'}>
+                <div className="vehicle-popup">
+                  <h3>ID: {vehicle.device_id}</h3>
+                  <p>Status: {getVehicleStatus(vehicle)}</p>
+                  <p>Speed: {formatSpeed(vehicle.last_speed)}</p>
+                  <p>Last Update: {formatDateTime(vehicle.last_update)}</p>
+                  <p>
+                    Location: {formatCoordinate(vehicle.last_latitude)}, 
+                    {formatCoordinate(vehicle.last_longitude)}
+                  </p>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
+      </MapContainer>
+    </div>
   );
 }
 

@@ -1,82 +1,133 @@
+.map-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 1;
+}
+
 .map-container {
-    width: 100%;
-    height: 100vh;
+  width: 100%;
+  height: 100%;
+}
+
+/* Loading state */
+.map-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border-radius: 8px;
+  z-index: 1000;
+}
+
+/* Error state */
+.map-error {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px;
+  background: rgba(220, 38, 38, 0.9);
+  color: white;
+  border-radius: 8px;
+  z-index: 1000;
+}
+
+/* Custom Markers */
+.custom-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.marker-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.active .marker-dot {
+  background-color: #4CAF50;
+  animation: pulse 1.5s infinite;
+}
+
+.moving .marker-dot {
+  background-color: #2196F3;
+}
+
+.stopped .marker-dot {
+  background-color: #f44336;
+}
+
+/* Popup Styling */
+.vehicle-popup {
+  padding: 5px;
+}
+
+.vehicle-popup h3 {
+  margin: 0 0 10px 0;
+  color: #333;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 5px;
+}
+
+.vehicle-popup p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+/* Dark mode popup */
+.dark-popup .leaflet-popup-content-wrapper {
+  background-color: #333;
+  color: #fff;
+}
+
+.dark-popup .leaflet-popup-tip {
+  background-color: #333;
+}
+
+.dark-popup .vehicle-popup h3 {
+  color: #fff;
+  border-bottom-color: #555;
+}
+
+/* Pulse Animation */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
   }
-  
-  .map-loading,
-  .map-error {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 20px;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    border-radius: 8px;
-    z-index: 1000;
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
   }
-  
-  .map-error {
-    background: rgba(220, 38, 38, 0.9);
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
-  
-  /* Custom Markers */
-  .custom-marker {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .marker-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    border: 3px solid white;
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
-  }
-  
-  .active .marker-dot {
-    background-color: #4CAF50;
-    animation: pulse 1.5s infinite;
-  }
-  
-  .moving .marker-dot {
-    background-color: #2196F3;
-  }
-  
-  .stopped .marker-dot {
-    background-color: #f44336;
-  }
-  
-  /* Popup Styling */
-  .vehicle-popup {
-    padding: 5px;
-  }
-  
-  .vehicle-popup h3 {
-    margin: 0 0 10px 0;
-    color: #333;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 5px;
-  }
-  
-  .vehicle-popup p {
-    margin: 5px 0;
-    font-size: 14px;
-  }
-  
-  /* Pulse Animation */
-  @keyframes pulse {
-    0% {
-      transform: scale(1);
-      opacity: 1;
-    }
-    50% {
-      transform: scale(1.2);
-      opacity: 0.7;
-    }
-    100% {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
+}
+
+/* Marker colors for dark mode */
+.dark .marker-dot {
+  border-color: #333;
+}
+
+.dark .active .marker-dot {
+  box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+}
+
+/* Loading dan error states untuk dark mode */
+.dark .map-loading,
+.dark .map-error {
+  background: rgba(51, 51, 51, 0.9);
+  color: #fff;
+}
