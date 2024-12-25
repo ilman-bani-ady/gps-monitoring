@@ -16,7 +16,7 @@ function History({ darkMode }) {
   const [center, setCenter] = useState([-6.306393, 106.888775]);
   const [showSummary, setShowSummary] = useState(true);
 
-  // Format tanggal untuk API
+  // Format tanggal untuk API   aaa 
   const formatDateForAPI = (date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
