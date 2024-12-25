@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Map from './components/Map';
 import ListArmada from './pages/ListArmada';
 import RouteMap from './pages/RouteMap';
+import History from './pages/History';
 import './App.css';
 
 function App() {
@@ -11,10 +12,7 @@ function App() {
   return (
     <Router>
       <div className={`App ${darkMode ? 'dark-mode' : 'light-mode'}`}>
-        {/* Header trigger */}
-        <div className="header-trigger"></div>
-        
-        {/* Header */}
+        {/* Header - tidak perlu trigger */}
         <div className="header">
           <div className="header-left">
             <h1>GPS Monitoring</h1>
@@ -41,6 +39,10 @@ function App() {
               <span className="icon">🛣️</span>
               Rute
             </Link>
+            <Link to="/history" className="sidebar-button">
+              <span className="icon">📜</span>
+              History
+            </Link>
             <Link to="/armada" className="sidebar-button">
               <span className="icon">🚗</span>
               List Armada
@@ -61,6 +63,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Map darkMode={darkMode} />} />
             <Route path="/routes" element={<RouteMap darkMode={darkMode} />} />
+            <Route path="/history" element={<History darkMode={darkMode} />} />
             <Route path="/armada" element={<ListArmada />} />
             {/* Add other routes here */}
           </Routes>
