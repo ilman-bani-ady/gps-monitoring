@@ -15,18 +15,40 @@ function ListArmada() {
   const fetchArmada = async () => {
     try {
       const response = await fetch('http://localhost:3013/api/tracking/fleet');
-      if (!response.ok) {
-        throw new Error('Failed to fetch');
-      }
+      if (!response.ok) throw new Error('Failed to fetch');
       const result = await response.json();
-      console.log('Data fetched:', result.data); // Debug log
       setArmada(result.data);
       setLoading(false);
     } catch (err) {
-      console.error('Fetch error:', err); // Debug log
       setError(err.message);
       setLoading(false);
     }
+  };
+
+  // Fungsi untuk mengecek apakah update terakhir kurang dari 1 menit
+  const isRecentlyUpdated = (lastUpdate) => {
+    try {
+      const lastUpdateTime = new Date(lastUpdate).getTime();
+      const currentTime = new Date().getTime();
+      const diffInMinutes = (currentTime - lastUpdateTime) / (1000 * 60);
+      return diffInMinutes <= 1;
+    } catch {
+      return false;
+    }
+  };
+
+  // Fungsi untuk menentukan status armada
+  const getVehicleStatus = (speed, lastUpdate) => {
+    const isRecent = isRecentlyUpdated(lastUpdate);
+    if (isRecent) {
+      return {
+        text: 'Aktif',
+        class: 'active'
+      };
+    }
+    return parseFloat(speed) > 0 
+      ? { text: 'Bergerak', class: 'moving' }
+      : { text: 'Berhenti', class: 'stopped' };
   };
 
   const formatDateTime = (dateString) => {
@@ -40,7 +62,7 @@ function ListArmada() {
         minute: '2-digit',
         second: '2-digit'
       });
-    } catch (e) {
+    } catch {
       return 'Invalid Date';
     }
   };
@@ -60,14 +82,6 @@ function ListArmada() {
       return `${parseFloat(speed).toFixed(1)} km/h`;
     } catch {
       return '0 km/h';
-    }
-  };
-
-  const isMoving = (speed) => {
-    try {
-      return parseFloat(speed) > 0;
-    } catch {
-      return false;
     }
   };
 
@@ -110,35 +124,39 @@ function ListArmada() {
             </tr>
           </thead>
           <tbody>
-            {armada.map((item, index) => (
-              <tr key={item.device_id || index}>
-                <td>{index + 1}</td>
-                <td>{item.device_id || 'Unknown'}</td>
-                <td>{formatDateTime(item.last_update)}</td>
-                <td>
-                  {item.last_latitude && item.last_longitude ? (
-                    <a 
-                      href={`https://www.google.com/maps?q=${item.last_latitude},${item.last_longitude}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="location-link"
-                    >
-                      {formatCoordinate(item.last_latitude)}, {formatCoordinate(item.last_longitude)}
-                    </a>
-                  ) : (
-                    'Lokasi tidak tersedia'
-                  )}
-                </td>
-                <td className={isMoving(item.last_speed) ? 'speed-active' : 'speed-stopped'}>
-                  {formatSpeed(item.last_speed)}
-                </td>
-                <td>
-                  <span className={`status ${isMoving(item.last_speed) ? 'moving' : 'stopped'}`}>
-                    {isMoving(item.last_speed) ? 'Bergerak' : 'Berhenti'}
-                  </span>
-                </td>
-              </tr>
-            ))}
+            {armada.map((item, index) => {
+              const status = getVehicleStatus(item.last_speed, item.last_update);
+              
+              return (
+                <tr key={item.device_id || index}>
+                  <td>{index + 1}</td>
+                  <td>{item.device_id || 'Unknown'}</td>
+                  <td>{formatDateTime(item.last_update)}</td>
+                  <td>
+                    {item.last_latitude && item.last_longitude ? (
+                      <a 
+                        href={`https://www.google.com/maps?q=${item.last_latitude},${item.last_longitude}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="location-link"
+                      >
+                        {formatCoordinate(item.last_latitude)}, {formatCoordinate(item.last_longitude)}
+                      </a>
+                    ) : (
+                      'Lokasi tidak tersedia'
+                    )}
+                  </td>
+                  <td className={status.class}>
+                    {formatSpeed(item.last_speed)}
+                  </td>
+                  <td>
+                    <span className={`status ${status.class}`}>
+                      {status.text}
+                    </span>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
