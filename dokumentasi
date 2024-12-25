@@ -1,0 +1,17 @@
+npx create-react-app my-landing-page
+cd my-landing-page
+
+
+npm install
+npm install react-router-dom
+npm install web-vitals
+npm install leaflet react-leaflet
+npm install @mui/material
+npm install @mui/icons-material
+npm install @mui/styles
+npm install @mui/material/styles
+npm install @mui/icons-material/styles
+npm install @mui/material/styles
+npm install @mui/icons-material/styles
+npm install @mui/material/styles
+npm install @mui/icons-material/styles

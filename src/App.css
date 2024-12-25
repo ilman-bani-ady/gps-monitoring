@@ -1,0 +1,310 @@
+/* Reset CSS */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.App {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  transition: transform 0.3s ease;
+  transform: translateY(-100%);
+}
+
+.light-mode .header {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #fff;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.light-mode h1 {
+  color: #333;
+  text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+}
+
+.theme-toggle {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.map-fullscreen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.leaflet-container {
+  width: 100%;
+  height: 100vh;
+}
+
+/* Dark mode styles */
+.dark-mode .leaflet-popup-content-wrapper,
+.dark-mode .leaflet-popup-tip {
+  background-color: #333333;
+  color: #ffffff;
+}
+
+.dark-mode .leaflet-control-zoom {
+  background-color: #333333;
+}
+
+.dark-mode .leaflet-control-zoom a {
+  color: #ffffff;
+}
+
+/* Mengatur posisi tombol zoom */
+.leaflet-control-container .leaflet-top.leaflet-left {
+  top: 70px; /* Sesuaikan dengan tinggi header */
+}
+
+/* Styling untuk control zoom */
+.leaflet-control-zoom {
+  border: none !important;
+  margin: 15px !important;
+}
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+  color: white !important;
+  width: 35px !important;
+  height: 35px !important;
+  line-height: 35px !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease;
+}
+
+/* Hover effect untuk tombol zoom */
+.leaflet-control-zoom-in:hover,
+.leaflet-control-zoom-out:hover {
+  background-color: rgba(0, 0, 0, 0.9) !important;
+}
+
+/* Style untuk light mode */
+.light-mode .leaflet-control-zoom-in,
+.light-mode .leaflet-control-zoom-out {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  color: #333 !important;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.light-mode .leaflet-control-zoom-in:hover,
+.light-mode .leaflet-control-zoom-out:hover {
+  background-color: #ffffff !important;
+}
+
+/* Style untuk dark mode */
+.dark-mode .leaflet-control-zoom-in,
+.dark-mode .leaflet-control-zoom-out {
+  background-color: rgba(51, 51, 51, 0.9) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.dark-mode .leaflet-control-zoom-in:hover,
+.dark-mode .leaflet-control-zoom-out:hover {
+  background-color: #444 !important;
+}
+
+/* Header updates */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.menu-toggle {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.light-mode .menu-toggle {
+  color: #333;
+}
+
+/* Sidebar styling dengan auto-hide */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -280px; /* Sembunyikan sidebar */
+  width: 280px;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(10px);
+  transition: left 0.3s ease;
+  z-index: 999;
+}
+
+/* Area trigger untuk sidebar */
+.sidebar-trigger {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 20px; /* Area sensitif untuk trigger */
+  height: 100vh;
+  z-index: 998;
+}
+
+/* Tampilkan sidebar saat hover pada trigger atau sidebar */
+.sidebar-trigger:hover + .sidebar,
+.sidebar:hover {
+  left: 0;
+}
+
+/* Light mode sidebar */
+.light-mode .sidebar {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* Styling untuk konten sidebar */
+.sidebar-content {
+  padding-top: 70px; /* Beri ruang untuk header */
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 10px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* Update styling untuk button sidebar */
+.sidebar-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 16px;
+  text-align: left;
+  text-decoration: none; /* Untuk Link components */
+  width: 100%;
+}
+
+.light-mode .sidebar-button {
+  background: rgba(0, 0, 0, 0.1);
+  color: #333;
+}
+
+.sidebar-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateX(5px);
+}
+
+.light-mode .sidebar-button:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-button .icon {
+  font-size: 20px;
+}
+
+.logout {
+  margin-top: auto;
+  background: rgba(255, 0, 0, 0.2);
+}
+
+.logout:hover {
+  background: rgba(255, 0, 0, 0.3);
+}
+
+/* Memastikan map tetap full screen */
+.map-fullscreen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Area trigger untuk menampilkan header */
+.header-trigger {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  z-index: 999;
+}
+
+/* Tampilkan header saat hover pada trigger area atau header */
+.header-trigger:hover + .header,
+.header:hover {
+  transform: translateY(0);
+}
+
+/* Update untuk konten utama */
+.main-content {
+  margin-left: 0; /* Reset margin karena sidebar auto-hide */
+  transition: margin-left 0.3s ease;
+}
+
+/* Styling khusus untuk tombol peta */
+.sidebar-button.active {
+  background: rgba(255, 255, 255, 0.2);
+  border-left: 4px solid #4CAF50;
+}
+
+.light-mode .sidebar-button.active {
+  background: rgba(0, 0, 0, 0.2);
+  border-left: 4px solid #4CAF50;
+}
+
+/* Opsional: Tambahkan separator setelah tombol peta */
+.sidebar-content .sidebar-button:first-child {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 15px;
+  margin-bottom: 5px;
+}
+
+.light-mode .sidebar-content .sidebar-button:first-child {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
