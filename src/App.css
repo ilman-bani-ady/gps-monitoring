@@ -11,7 +11,7 @@
   transition: all 0.3s ease;
 }
 
-/* Header styling - tidak lagi menggunakan hide/show */
+/* Header styling */
 .header {
   position: fixed;
   top: 0;
@@ -27,16 +27,6 @@
   z-index: 1000;
 }
 
-/* Hapus header trigger karena tidak diperlukan lagi */
-/* .header-trigger {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 20px;
-  z-index: 999;
-} */
-
 .light-mode .header {
   background: rgba(255, 255, 255, 0.9);
   color: #333;
@@ -48,10 +38,17 @@
   align-items: center;
 }
 
+.header-right {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
 .header h1 {
   color: white;
   margin: 0;
   font-size: 24px;
+  text-align: left;
 }
 
 .light-mode .header h1 {
