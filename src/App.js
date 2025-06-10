@@ -20,7 +20,7 @@ const ProtectedRoute = ({ children }) => {
 
 function AppContent() {
   const [darkMode, setDarkMode] = useState(false);
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, logout, user } = useAuth();
 
   const handleLogout = () => {
     logout();
@@ -37,6 +37,9 @@ function AppContent() {
               <h1>GPS Monitoring</h1>
             </div>
             <div className="header-right">
+              {user && (
+                <span className="user-info">{user.full_name || user.username}</span>
+              )}
               <button 
                 className="theme-toggle"
                 onClick={() => setDarkMode(!darkMode)}

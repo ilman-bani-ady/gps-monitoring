@@ -3,6 +3,7 @@ cd my-landing-page
 
 
 npm install
+npm install bootstrap
 npm install react-router-dom
 npm install web-vitals
 npm install leaflet react-leaflet
