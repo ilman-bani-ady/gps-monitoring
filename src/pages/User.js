@@ -15,6 +15,7 @@ function User() {
   const [showAddForm, setShowAddForm] = useState(false);
   const { user } = useAuth();
   const addUserModalRef = useRef();
+  const [notif, setNotif] = useState({ show: false, type: '', message: '' });
 
   useEffect(() => {
     fetchUsers();
@@ -23,8 +24,9 @@ function User() {
   const fetchUsers = async () => {
     try {
       const response = await fetch('http://localhost:3013/api/user', {
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         }
       });
       
@@ -52,13 +54,18 @@ function User() {
     setEditForm({ ...editForm, [e.target.name]: e.target.value });
   };
 
+  const showNotif = (type, message) => {
+    setNotif({ show: true, type, message });
+    setTimeout(() => setNotif({ show: false, type: '', message: '' }), 3000);
+  };
+
   const handleEditSave = async (id) => {
     try {
       const response = await fetch(`http://localhost:3013/api/user/${id}`, {
         method: 'PUT',
+        credentials: 'include',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(editForm)
       });
@@ -67,8 +74,9 @@ function User() {
       }
       setEditUserId(null);
       fetchUsers();
+      showNotif('success', 'User updated successfully!');
     } catch (err) {
-      alert(err.message);
+      showNotif('danger', err.message);
     }
   };
 
@@ -77,17 +85,16 @@ function User() {
     try {
       const response = await fetch(`http://localhost:3013/api/user/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+        credentials: 'include'
       });
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.message || 'Failed to delete user');
       }
       fetchUsers();
+      showNotif('success', 'User deleted successfully!');
     } catch (err) {
-      alert(err.message);
+      showNotif('danger', err.message);
     }
   };
 
@@ -101,9 +108,9 @@ function User() {
     try {
       const response = await fetch('http://localhost:3013/api/user', {
         method: 'POST',
+        credentials: 'include',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(addForm)
       });
@@ -113,8 +120,10 @@ function User() {
       }
       setAddForm({ username: '', password: '', full_name: '', role: 'user' });
       fetchUsers();
+      showNotif('success', 'User added successfully!');
     } catch (err) {
       setAddError(err.message);
+      showNotif('danger', err.message);
     }
   };
 
@@ -232,6 +241,12 @@ function User() {
               </tbody>
             </table>
           </div>
+          {/* Notifikasi pop up */}
+          {notif.show && (
+            <div className={`alert alert-${notif.type} position-fixed top-0 start-50 translate-middle-x mt-3`} style={{zIndex: 2000, minWidth: 300}}>
+              {notif.message}
+            </div>
+          )}
         </div>
       </div>
       {/* {user && user.role === 'admin' && (

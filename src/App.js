@@ -71,10 +71,12 @@ function AppContent() {
                 <span className="icon">🚗</span>
                 List Armada
               </Link>
-              <Link to="/user" className="sidebar-button">
-                <span className="icon">👤</span>
-                User
-              </Link>
+              {user && user.role === 'admin' && (
+                <Link to="/user" className="sidebar-button">
+                  <span className="icon">👤</span>
+                  User
+                </Link>
+              )}
               <button className="sidebar-button logout" onClick={handleLogout}>
                 <span className="icon">🚪</span>
                 Logout
@@ -110,7 +112,7 @@ function AppContent() {
           } />
           <Route path="/user" element={
             <ProtectedRoute>
-              <User />
+              {user && user.role === 'admin' ? <User /> : <div>Access denied</div>}
             </ProtectedRoute>
           } />
         </Routes>

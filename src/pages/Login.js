@@ -15,29 +15,10 @@ function Login() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-
     try {
-      const response = await fetch('http://localhost:3013/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username, password })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
-
-      // Use the login function from AuthContext
-      login(data.data.token, data.data.user);
-
-      // Redirect to home page
+      await login(username, password);
       navigate('/');
     } catch (err) {
-      console.error('Login error:', err);
       setError(err.message);
     } finally {
       setLoading(false);

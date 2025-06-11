@@ -5,32 +5,58 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-    if (token && userData) {
-      setIsLoggedIn(true);
-      setUser(JSON.parse(userData));
-    }
+    // Cek session ke backend
+    const checkSession = async () => {
+      try {
+        const res = await fetch('http://localhost:3013/api/auth/session', {
+          credentials: 'include',
+        });
+        if (!res.ok) throw new Error('No session');
+        const data = await res.json();
+        setIsLoggedIn(true);
+        setUser(data.data.user);
+      } catch {
+        setIsLoggedIn(false);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    checkSession();
   }, []);
 
-  const login = (token, userData) => {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(userData));
+  const login = async (username, password) => {
+    const res = await fetch('http://localhost:3013/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ username, password })
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.message || 'Login failed');
+    }
+    const data = await res.json();
     setIsLoggedIn(true);
-    setUser(userData);
+    setUser(data.data.user);
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+  const logout = async () => {
+    // Hapus cookie di backend (opsional: buat endpoint logout)
+    document.cookie = 'token=; Max-Age=0; path=/;';
     setIsLoggedIn(false);
     setUser(null);
   };
 
+  if (loading) {
+    return <div>Loading...</div>; // Atau spinner
+  }
+
   return (
-    <AuthContext.Provider value={{ isLoggedIn, user, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
