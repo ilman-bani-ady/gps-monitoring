@@ -121,7 +121,7 @@ function History({ darkMode }) {
 
   const fetchVehicles = async () => {
     try {
-      const response = await fetch('http://localhost:3013/api/tracking/fleet');
+      const response = await fetch('http://103.245.39.149:3013/api/tracking/fleet');
       if (!response.ok) throw new Error('Failed to fetch vehicles');
       const result = await response.json();
       if (result.status === 'success') {
@@ -147,7 +147,7 @@ function History({ darkMode }) {
       const start = formatDateForAPI(startDate);
       const end = formatDateForAPI(endDate);
       
-      const url = `http://localhost:3013/api/tracking/history/${selectedVehicle}?start_date=${encodeURIComponent(start)}&end_date=${encodeURIComponent(end)}`;
+      const url = `http://103.245.39.149:3013/api/tracking/history/${selectedVehicle}?start_date=${encodeURIComponent(start)}&end_date=${encodeURIComponent(end)}`;
       
       console.log('Request URL:', url);
       

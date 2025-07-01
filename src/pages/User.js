@@ -24,6 +24,7 @@ function User() {
   const fetchUsers = async () => {
     try {
       const response = await fetch('http://localhost:3013/api/user', {
+      const response = await fetch('http://103.245.39.149:3013/api/user', {
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
@@ -61,7 +62,7 @@ function User() {
 
   const handleEditSave = async (id) => {
     try {
-      const response = await fetch(`http://localhost:3013/api/user/${id}`, {
+      const response = await fetch(`http://103.245.39.149:3013/api/user/${id}`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -83,7 +84,7 @@ function User() {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
     try {
-      const response = await fetch(`http://localhost:3013/api/user/${id}`, {
+      const response = await fetch(`http://103.245.39.149:3013/api/user/${id}`, {
         method: 'DELETE',
         credentials: 'include'
       });
@@ -106,7 +107,7 @@ function User() {
     e.preventDefault();
     setAddError(null);
     try {
-      const response = await fetch('http://localhost:3013/api/user', {
+      const response = await fetch('http://103.245.39.149:3013/api/user', {
         method: 'POST',
         credentials: 'include',
         headers: {

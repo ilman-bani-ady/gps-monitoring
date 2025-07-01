@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
     // Cek session ke backend
     const checkSession = async () => {
       try {
-        const res = await fetch('http://localhost:3013/api/auth/session', {
+        const res = await fetch('http://103.245.39.149:3013/api/auth/session', {
           credentials: 'include',
         });
         if (!res.ok) throw new Error('No session');
@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (username, password) => {
-    const res = await fetch('http://localhost:3013/api/auth/login', {
+    const res = await fetch('http://103.245.39.149:3013/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
