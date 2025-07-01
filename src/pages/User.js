@@ -23,7 +23,6 @@ function User() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('http://localhost:3013/api/user', {
       const response = await fetch('http://103.245.39.149:3013/api/user', {
         credentials: 'include',
         headers: {
