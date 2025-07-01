@@ -50,30 +50,38 @@ function ListArmada() {
     fetchArmada(true); // true = tampilkan loading indicator
   };
 
-  // Fungsi untuk mengecek apakah update terakhir kurang dari 1 menit
-  const isRecentlyUpdated = (lastUpdate) => {
+  // Fungsi untuk mengecek range waktu update
+  const getUpdateTimeRange = (lastUpdate) => {
     try {
       const lastUpdateTime = new Date(lastUpdate).getTime();
       const currentTime = new Date().getTime();
       const diffInMinutes = (currentTime - lastUpdateTime) / (1000 * 60);
-      return diffInMinutes <= 1;
+      return diffInMinutes;
     } catch {
-      return false;
+      return Infinity;
     }
   };
 
   // Fungsi untuk menentukan status armada
   const getVehicleStatus = (speed, lastUpdate) => {
-    const isRecent = isRecentlyUpdated(lastUpdate);
-    if (isRecent) {
+    const timeDiff = getUpdateTimeRange(lastUpdate);
+    
+    if (timeDiff <= 2) {
       return {
         text: 'Aktif',
         class: 'active'
       };
+    } else if (timeDiff <= 5) {
+      return {
+        text: 'Bergerak',
+        class: 'moving'
+      };
+    } else {
+      return {
+        text: 'Berhenti',
+        class: 'stopped'
+      };
     }
-    return parseFloat(speed) > 0 
-      ? { text: 'Bergerak', class: 'moving' }
-      : { text: 'Berhenti', class: 'stopped' };
   };
 
   const formatDateTime = (dateString) => {
